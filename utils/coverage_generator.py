@@ -90,6 +90,20 @@ def generate_coverage(screenplay_text: str, api_key: str) -> Optional[dict]:
     except anthropic.RateLimitError:
         return {"_error": "Rate limit reached. Please wait a moment and try again."}
     except anthropic.APIStatusError as exc:
+        if "credit balance" in str(exc).lower():
+            return {"_error": (
+                "CREDIT_ERROR: Your credit balance is too low and needs to be topped up. "
+                "Please contact the app owner or follow the below steps:\n\n"
+                "**Step 1 — Go to Anthropic Console**  \n"
+                "👉 https://console.anthropic.com\n\n"
+                "**Step 2 — Add Credits**  \n"
+                "1. Click 'Settings' in the left sidebar  \n"
+                "2. Click 'Billing'  \n"
+                "3. Click 'Add Credits'  \n"
+                "4. Add $5–10 to start — that's plenty for portfolio testing  \n"
+                "   - Script coverage runs cost roughly $0.02–0.05 per screenplay with Claude Opus  \n"
+                "   - $10 = ~200–500 test runs"
+            )}
         return {"_error": f"API error {exc.status_code}: {exc.message}"}
     except Exception as exc:
         return {"_error": f"Unexpected error: {exc}"}

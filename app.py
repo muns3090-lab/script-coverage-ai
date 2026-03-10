@@ -550,7 +550,9 @@ if uploaded_file:
     if st.session_state.coverage:
         if "_error" in st.session_state.coverage:
             err = st.session_state.coverage["_error"]
-            if "Invalid API key" in err:
+            if err.startswith("CREDIT_ERROR:"):
+                st.markdown(err[len("CREDIT_ERROR:"):].strip())
+            elif "Invalid API key" in err:
                 st.error(
                     "**Authentication failed.** Your API key appears to be invalid or expired.\n\n"
                     "Check that `ANTHROPIC_API_KEY` in your `.env` file is correct and hasn't been revoked."
